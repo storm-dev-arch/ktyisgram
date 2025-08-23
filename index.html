@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KTYISGram - Мессенджер для студентов КТУИС</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+        .animate-fadeInUp {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #9333ea 100%);
+        }
+        .message-bubble {
+            position: relative;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin: 0.5rem;
+            max-width: 70%;
+        }
+        .message-bubble:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 0;
+            height: 0;
+            border: 10px solid transparent;
+        }
+        .received {
+            background-color: #e5e7eb;
+            align-self: flex-start;
+        }
+        .received:after {
+            left: 0;
+            border-right-color: #e5e7eb;
+            border-left: 0;
+            margin-left: -10px;
+        }
+        .sent {
+            background-color: #4f46e5;
+            color: white;
+            align-self: flex-end;
+        }
+        .sent:after {
+            right: 0;
+            border-left-color: #4f46e5;
+            border-right: 0;
+            margin-right: -10px;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .screenshot {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+        }
+        .screenshot:hover {
+            transform: scale(1.03);
+        }
+        .typing-indicator {
+            display: flex;
+            padding: 10px;
+        }
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #9ca3af;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing 1.5s infinite ease-in-out;
+        }
+        .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50">
+    <!-- Навигация -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-comment-dots text-indigo-600 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-indigo-600">KTYISGram</span>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#about" class="text-gray-700 hover:text-indigo-600 transition">О проекте</a>
+                    <a href="#features" class="text-gray-700 hover:text-indigo-600 transition">Возможности</a>
+                    <a href="#screenshots" class="text-gray-700 hover:text-indigo-600 transition">Скриншоты</a>
+                    <a href="#team" class="text-gray-700 hover:text-indigo-600 transition">Команда</a>
+                    <a href="#download" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">Скачать</a>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button class="mobile-menu-button p-2 focus:outline-none">
+                        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Мобильное меню -->
+        <div class="mobile-menu hidden md:hidden bg-white">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#about" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">О проекте</a>
+                <a href="#features" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">Возможности</a>
+                <a href="#screenshots" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">Скриншоты</a>
+                <a href="#team" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">Команда</a>
+                <a href="#download" class="block px-3 py-2 text-base font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Скачать</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Герой-секция -->
+    <header class="gradient-bg text-white">
+        <div class="max-w-6xl mx-auto px-4 py-20 md:py-32 flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 mb-10 md:mb-0">
+                <h1 class="text-4xl md:text-5xl font-bold mb-6 animate-fadeInUp" style="animation-delay: 0.2s">KTYISGram</h1>
+                <p class="text-xl mb-8 animate-fadeInUp" style="animation-delay: 0.4s">Мессенджер, созданный студентами для студентов Краснодарского техникума управления, информатизации и сервиса</p>
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="#download" class="bg-white text-indigo-600 px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition text-center">Скачать сейчас</a>
+                    <a href="#features" class="border-2 border-white text-white px-6 py-3 rounded-md font-medium hover:bg-white hover:text-indigo-600 transition text-center">Узнать больше</a>
+                </div>
+            </div>
+            <div class="md:w-1/2 flex justify-center">
+                <div class="bg-white rounded-2xl p-4 shadow-2xl w-full max-w-md animate-float">
+                    <div class="bg-gray-100 rounded-xl p-4 h-96 flex flex-col">
+                        <!-- Шапка чата -->
+                        <div class="flex items-center border-b pb-3 mb-3">
+                            <div class="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="ml-3">
+                                <div class="font-medium">Чат KTYISGram</div>
+                                <div class="text-xs text-gray-500 flex items-center">
+                                    <span class="typing-indicator mr-2">
+                                        <span class="typing-dot"></span>
+                                        <span class="typing-dot"></span>
+                                        <span class="typing-dot"></span>
+                                    </span>
+                                    печатает...
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Сообщения -->
+                        <div class="flex-1 overflow-y-auto mb-3 space-y-2">
+                            <div class="message-bubble received">
+                                Привет! Как дела?
+                            </div>
+                            <div class="message-bubble sent">
+                                Отлично! Только что установил KTYISGram
+                            </div>
+                            <div class="message-bubble received">
+                                Круто! Это же мессенджер, который разработали наши студенты?
+                            </div>
+                            <div class="message-bubble sent">
+                                Да, именно! Очень удобный и быстрый
+                            </div>
+                            <div class="message-bubble received">
+                                Надо тоже скачать. Где можно найти?
+                            </div>
+                        </div>
+                        
+                        <!-- Поле ввода -->
+                        <div class="flex items-center border-t pt-3">
+                            <input type="text" placeholder="Напишите сообщение..." class="flex-1 border rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <button class="ml-2 w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center hover:bg-indigo-700">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- О проекте -->
+    <section id="about" class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">О проекте KTYISGram</h2>
+                <div class="w-20 h-1 bg-indigo-600 mx-auto"></div>
+            </div>
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80" alt="Студенты КТУИС" class="rounded-lg shadow-xl w-full">
+                </div>
+                <div class="md:w-1/2 md:pl-12">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6">Мессенджер, созданный в честь поступления в КТУИС</h3>
+                    <p class="text-gray-600 mb-6">KTYISGram - это мессенджер, разработанный двумя студентами Краснодарского техникума управления, информатизации и сервиса в качестве проекта, посвященного их поступлению в это учебное заведение.</p>
+                    <p class="text-gray-600 mb-6">Проект был создан на базе Python с использованием современных технологий и фреймворков. Основная цель - предоставить студентам удобный инструмент для общения, обмена информацией и совместной работы.</p>
+                    <div class="flex items-center">
+                        <div class="bg-indigo-100 p-3 rounded-full mr-4">
+                            <i class="fas fa-graduation-cap text-indigo-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-800">Для студентов КТУИС</h4>
+                            <p class="text-gray-600">Создано студентами для студентов техникума</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Возможности -->
+    <section id="features" class="py-20 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Возможности KTYISGram</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Наш мессенджер предлагает все необходимое для удобного общения и совместной работы</p>
+                <div class="w-20 h-1 bg-indigo-600 mx-auto mt-4"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Карточка 1 -->
+                <div class="feature-card bg-white p-8 rounded-lg shadow-md transition duration-300 animate-fadeInUp" style="animation-delay: 0.1s">
+                    <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-comments text-indigo-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Мгновенные сообщения</h3>
+                    <p class="text-gray-600">Отправляйте и получайте сообщения в реальном времени без задержек</p>
+                </div>
+                
+                <!-- Карточка 2 -->
+                <div class="feature-card bg-white p-8 rounded-lg shadow-md transition duration-300 animate-fadeInUp" style="animation-delay: 0.2s">
+                    <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-users text-indigo-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Групповые чаты</h3>
+                    <p class="text-gray-600">Создавайте чаты для групп, курсов или друзей для совместного общения</p>
+                </div>
+                
+                <!-- Карточка 3 -->
+                <div class="feature-card bg-white p-8 rounded-lg shadow-md transition duration-300 animate-fadeInUp" style="animation-delay: 0.3s">
+                    <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-file-upload text-indigo-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Обмен файлами</h3>
+                    <p class="text-gray-600">Отправляйте документы, изображения и другие файлы прямо в чате</p>
+                </div>
+                
+                <!-- Карточка 4 -->
+                <div class="feature-card bg-white p-8 rounded-lg shadow-md transition duration-300 animate-fadeInUp" style="animation-delay: 0.4s">
+                    <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-shield-alt text-indigo-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Безопасность</h3>
+                    <p class="text-gray-600">Ваши данные защищены с помощью современных технологий шифрования</p>
+                </div>
+                
+                <!-- Карточка 5 -->
+                <div class="feature-card bg-white p-8 rounded-lg shadow-md transition duration-300 animate-fadeInUp" style="animation-delay: 0.5s">
+                    <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-bell text-indigo-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Уведомления</h3>
+                    <p class="text-gray-600">Получайте мгновенные уведомления о новых сообщениях и событиях</p>
+                </div>
+                
+                <!-- Карточка 6 -->
+                <div class="feature-card bg-white p-8 rounded-lg shadow-md transition duration-300 animate-fadeInUp" style="animation-delay: 0.6s">
+                    <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-palette text-indigo-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Кастомизация</h3>
+                    <p class="text-gray-600">Настраивайте интерфейс под свои предпочтения с помощью тем и настроек</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Скриншоты -->
+    <section id="screenshots" class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Скриншоты приложения</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Посмотрите, как выглядит KTYISGram в действии</p>
+                <div class="w-20 h-1 bg-indigo-600 mx-auto mt-4"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="screenshot">
+                    <img src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Скриншот чата" class="rounded-lg w-full">
+                </div>
+                <div class="screenshot">
+                    <img src="https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80" alt="Скриншот списка чатов" class="rounded-lg w-full">
+                </div>
+                <div class="screenshot">
+                    <img src="https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Скриншот настроек" class="rounded-lg w-full">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Команда -->
+    <section id="team" class="py-20 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Наша команда</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Два студента, которые создали KTYISGram</p>
+                <div class="w-20 h-1 bg-indigo-600 mx-auto mt-4"></div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-center items-center space-y-10 md:space-y-0 md:space-x-10">
+                <!-- Разработчик 1 -->
+                <div class="bg-white p-8 rounded-lg shadow-md text-center w-full max-w-sm animate-fadeInUp" style="animation-delay: 0.2s">
+                    <div class="w-32 h-32 rounded-full bg-indigo-100 mx-auto mb-6 flex items-center justify-center overflow-hidden">
+                        <i class="fas fa-user-graduate text-indigo-600 text-5xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Алексей Иванов</h3>
+                    <p class="text-indigo-600 mb-4">Разработчик | Студент КТУИС</p>
+                    <p class="text-gray-600 mb-4">Отвечал за backend-разработку и архитектуру приложения</p>
+                    <div class="flex justify-center space-x-4">
+                        <a href="#" class="text-gray-500 hover:text-indigo-600">
+                            <i class="fab fa-vk text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-indigo-600">
+                            <i class="fab fa-telegram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-indigo-600">
+                            <i class="fab fa-github text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Разработчик 2 -->
+                <div class="bg-white p-8 rounded-lg shadow-md text-center w-full max-w-sm animate-fadeInUp" style="animation-delay: 0.4s">
+                    <div class="w-32 h-32 rounded-full bg-indigo-100 mx-auto mb-6 flex items-center justify-center overflow-hidden">
+                        <i class="fas fa-user-graduate text-indigo-600 text-5xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Дмитрий Петров</h3>
+                    <p class="text-indigo-600 mb-4">Разработчик | Студент КТУИС</p>
+                    <p class="text-gray-600 mb-4">Отвечал за frontend-разработку и дизайн приложения</p>
+                    <div class="flex justify-center space-x-4">
+                        <a href="#" class="text-gray-500 hover:text-indigo-600">
+                            <i class="fab fa-vk text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-indigo-600">
+                            <i class="fab fa-telegram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-indigo-600">
+                            <i class="fab fa-github text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Скачать -->
+    <section id="download" class="py-20 gradient-bg text-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">Скачайте KTYISGram прямо сейчас</h2>
+                <p class="text-xl max-w-2xl mx-auto">Присоединяйтесь к сообществу студентов КТУИС</p>
+                <div class="w-20 h-1 bg-white mx-auto mt-4"></div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-center items-center space-y-6 md:space-y-0 md:space-x-6">
+                <div class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg p-8 rounded-lg max-w-md">
+                    <h3 class="text-xl font-semibold mb-4">Для Windows</h3>
+                    <p class="mb-6">Скачайте установочный файл для вашего компьютера</p>
+                    <a href="#" class="inline-flex items-center bg-white text-indigo-600 px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition">
+                        <i class="fab fa-windows mr-2"></i> Скачать для Windows
+                    </a>
+                </div>
+                <div class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg p-8 rounded-lg max-w-md">
+                    <h3 class="text-xl font-semibold mb-4">Для Android</h3>
+                    <p class="mb-6">Установите приложение на ваш смартфон или планшет</p>
+                    <a href="#" class="inline-flex items-center bg-white text-indigo-600 px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition">
+                        <i class="fab fa-android mr-2"></i> Скачать для Android
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Контакты -->
+    <section class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Свяжитесь с нами</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Есть вопросы или предложения? Напишите нам!</p>
+                <div class="w-20 h-1 bg-indigo-600 mx-auto mt-4"></div>
+            </div>
+            <div class="flex flex-col md:flex-row">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <div class="bg-gray-50 p-8 rounded-lg h-full">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-6">Контактная информация</h3>
+                        <div class="space-y-6">
+                            <div class="flex items-start">
+                                <div class="bg-indigo-100 p-3 rounded-full mr-4">
+                                    <i class="fas fa-map-marker-alt text-indigo-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Адрес</h4>
+                                    <p class="text-gray-600">Краснодарский техникум управления, информатизации и сервиса</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="bg-indigo-100 p-3 rounded-full mr-4">
+                                    <i class="fas fa-envelope text-indigo-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Email</h4>
+                                    <p class="text-gray-600">support@ktyisgram.ru</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="bg-indigo-100 p-3 rounded-full mr-4">
+                                    <i class="fas fa-phone text-indigo-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Телефон</h4>
+                                    <p class="text-gray-600">+7 (XXX) XXX-XX-XX</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:w-1/2 md:pl-8">
+                    <form class="bg-gray-50 p-8 rounded-lg">
+                        <div class="mb-6">
+                            <label for="name" class="block text-gray-700 font-medium mb-2">Ваше имя</label>
+                            <input type="text" id="name" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div class="mb-6">
+                            <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
+                            <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div class="mb-6">
+                            <label for="message" class="block text-gray-700 font-medium mb-2">Сообщение</label>
+                            <textarea id="message" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-md font-medium hover:bg-indigo-700 transition">Отправить сообщение</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Футер -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between">
+                <div class="mb-8 md:mb-0">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-comment-dots text-indigo-400 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold">KTYISGram</span>
+                    </div>
+                    <p class="text-gray-400 max-w-xs">Мессенджер для студентов Краснодарского техникума управления, информатизации и сервиса</p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Навигация</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#about" class="text-gray-400 hover:text-white transition">О проекте</a></li>
+                            <li><a href="#features" class="text-gray-400 hover:text-white transition">Возможности</a></li>
+                            <li><a href="#screenshots" class="text-gray-400 hover:text-white transition">Скриншоты</a></li>
+                            <li><a href="#team" class="text-gray-400 hover:text-white transition">Команда</a></li>
+                            <li><a href="#download" class="text-gray-400 hover:text-white transition">Скачать</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Ресурсы</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-white transition">Документация</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition">Блог</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition">FAQ</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition">Поддержка</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Соцсети</h3>
+                        <div class="flex space-x-4">
+                            <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-indigo-600 transition">
+                                <i class="fab fa-vk"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-indigo-600 transition">
+                                <i class="fab fa-telegram"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-indigo-600 transition">
+                                <i class="fab fa-github"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 mb-4 md:mb-0">© 2023 KTYISGram. Все права защищены.</p>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition">Политика конфиденциальности</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">Условия использования</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Скрипты -->
+    <script>
+        // Мобильное меню
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Плавная прокрутка
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+                
+                // Закрываем мобильное меню после клика
+                if (!mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        });
+        
+        // Анимация при скролле
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.animate-fadeInUp');
+            const windowHeight = window.innerHeight;
+            
+            elements.forEach(element => {
+                const elementPosition = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementPosition < windowHeight - elementVisible) {
+                    element.style.opacity = "1";
+                    element.style.transform = "translateY(0)";
+                }
+            });
+        };
+        
+        // Инициализация анимаций
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.animate-fadeInUp').forEach(el => {
+                el.style.opacity = "0";
+                el.style.transform = "translateY(20px)";
+                el.style.transition = "opacity 0.8s ease, transform 0.8s ease";
+            });
+        });
+        
+        // Запуск анимаций при скролле
+        window.addEventListener('scroll', animateOnScroll);
+        animateOnScroll(); // Запустить сразу для видимых элементов
+    </script>
+<p style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px;position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 4px 8px;">Made with <img src="https://enzostvs-deepsite.hf.space/logo.svg" alt="DeepSite Logo" style="width: 16px; height: 16px; vertical-align: middle;display:inline-block;margin-right:3px;filter:brightness(0) invert(1);"><a href="https://enzostvs-deepsite.hf.space" style="color: #fff;text-decoration: underline;" target="_blank" >DeepSite</a> - 🧬 <a href="https://enzostvs-deepsite.hf.space?remix=soulwhywalker/ktyisgram" style="color: #fff;text-decoration: underline;" target="_blank" >Remix</a></p></body>
+</html>
