@@ -6,6 +6,124 @@
     <title>KTYISGram - Мессенджер для студентов КТУИС</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- DDoS Guard Styles -->
+    <style>
+      #ddos-guard-overlay {
+        position: fixed; inset: 0; z-index: 99999;
+        display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #9333ea 100%);
+        color: #fff;
+      }
+      #ddos-guard-card {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 16px; padding: 28px; width: min(440px, 92vw);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      }
+      #ddos-guard-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+      #ddos-guard-text { font-size: 14px; opacity: 0.9; margin-bottom: 18px; }
+      #ddos-guard-spinner {
+        width: 44px; height: 44px; border-radius: 50%;
+        border: 4px solid rgba(255,255,255,0.25); border-top-color: #fff;
+        animation: spin 0.9s linear infinite; margin: 0 auto 14px auto;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .guard-lock-scroll { overflow: hidden !important; }
+    </style>
+
+    <!-- DDoS Guard Script -->
+    <script>
+    (function () {
+      const COOKIE = 'ktyis_guard';
+      const HOURS = 24;
+      const MIN_MS = 800;
+      const MAX_MS = 1200;
+      const isHttps = location.protocol === 'https:';
+
+      function setCookie(name, value, hours) {
+        const expires = new Date(Date.now() + hours * 3600 * 1000).toUTCString();
+        let c = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax`;
+        if (isHttps) c += '; Secure';
+        document.cookie = c;
+      }
+      function hasCookie(name) {
+        return document.cookie.split('; ').some(v => v.startsWith(name + '='));
+      }
+      function mountOverlay() {
+        document.documentElement.classList.add('guard-lock-scroll');
+        const ov = document.createElement('div');
+        ov.id = 'ddos-guard-overlay';
+        ov.innerHTML = `
+          <div id="ddos-guard-card">
+            <div id="ddos-guard-spinner"></div>
+            <div id="ddos-guard-title">Проверка браузера…</div>
+            <div id="ddos-guard-text">
+              Идёт быстрая проверка. Это займёт около секунды.
+            </div>
+            <noscript>
+              <div style="background:#fff;color:#111;border-radius:10px;padding:10px;font-size:14px;">
+                Для продолжения нужен JavaScript.
+              </div>
+            </noscript>
+          </div>`;
+        (document.body || document.documentElement).appendChild(ov);
+        return ov;
+      }
+      function doWork(ms) {
+        return new Promise(resolve => {
+          const end = performance.now() + ms;
+          let i = 0, acc = 0;
+          function chunk() {
+            let now = performance.now();
+            while (now < end && i < 1e7) {
+              acc = (acc * 33 + i) % 1000003;
+              i++;
+              if ((i & 2047) === 0) now = performance.now();
+            }
+            if (now >= end) resolve(acc);
+            else (window.requestIdleCallback || window.requestAnimationFrame || setTimeout)(chunk, 16);
+          }
+          chunk();
+        });
+      }
+      async function guard() {
+        if (hasCookie(COOKIE)) return;
+        const ov = mountOverlay();
+        try {
+          const target = MIN_MS + Math.floor(Math.random() * (MAX_MS - MIN_MS + 1));
+          await doWork(target);
+          setCookie(COOKIE, '1', HOURS);
+        } finally {
+          document.documentElement.classList.remove('guard-lock-scroll');
+          if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
+        }
+      }
+      if (!hasCookie(COOKIE)) {
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', guard, { once: true });
+        } else {
+          guard();
+        }
+      }
+    })();
+    </script>
+
+    <!-- Остальные твои стили -->
+    <style>
+      /* ... твои существующие стили из index.html ... */
+    </style>
+</head>
+<body class="font-sans bg-gray-50">
+
+<!-- No-JS fallback -->
+<noscript>
+  <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#111;color:#fff;z-index:99999;">
+    Для доступа к сайту включите JavaScript.
+  </div>
+</noscript>
+
+    
     <style>
         @keyframes fadeInUp {
             from {
