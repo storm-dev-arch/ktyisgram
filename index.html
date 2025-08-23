@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     <div id="ddos-guard-card">
       <div id="ddos-guard-spinner"></div>
       <div style="font-size:20px;font-weight:600;margin-bottom:6px;">Проверка на бота…</div>
-      <div style="font-size:14px;opacity:0.85;">Пожалуйста, подождите</div>
+      <div style="font-size:14px;opacity:0.85;">Пожалуйста, подождите 3 секунды</div>
     </div>
   `;
   document.body.appendChild(overlay);
@@ -72,11 +72,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <!-- No-JS fallback -->
 <noscript>
-  <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#111;color:#fff;z-index:99999;">
-    Для доступа к сайту включите JavaScript.
+  <style>
+    .noscript-overlay {
+      position: fixed; inset: 0; z-index: 99999;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #9333ea 100%);
+      color: #fff; font-family: sans-serif;
+    }
+    .noscript-card {
+      text-align: center;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      animation: fadeInUp 0.8s ease forwards;
+    }
+    .noscript-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .noscript-text {
+      font-size: 14px;
+      opacity: 0.85;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+  <div class="noscript-overlay">
+    <div class="noscript-card">
+      <div class="noscript-title">JavaScript отключён</div>
+      <div class="noscript-text">Для доступа к сайту включите JavaScript в настройках браузера</div>
+    </div>
   </div>
 </noscript>
-    
+
     <style>
         @keyframes fadeInUp {
             from {
